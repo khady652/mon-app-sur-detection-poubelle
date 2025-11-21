@@ -17,17 +17,20 @@ MODEL_FILE_NAME = "best (1).pt"
 
 @st.cache_resource
 def load_yolo_model():
-    if not os.path.exists(MODEL_FILE_NAME):
-        st.error(f" Fichier modèle '{MODEL_FILE_NAME}' non trouvé. Assurez-vous qu'il est dans le même dossier.")
-        return None
-
+    # REMPLACER le code existant par ceci :
     try:
-        model = YOLO(MODEL_FILE_NAME) 
-        st.success("")
+        # Tenter de charger directement le modèle. 
+        # Si le fichier est présent dans le repo, YOLO (ultralytics) le trouvera.
+        model = YOLO(MODEL_FILE_NAME)
+        st.success("✅ Modèle YOLO chargé avec succès.")
         return model
     except Exception as e:
-        st.error(f"❌ Erreur lors du chargement du modèle YOLO. Vérifiez votre installation d'ultralytics : {e}")
+        # Si le chargement échoue pour une raison (chemin, structure du fichier, etc.), 
+        # afficher l'erreur pour le débogage.
+        st.error(f"❌ Erreur critique lors du chargement du modèle YOLO '{MODEL_FILE_NAME}'. Vérifiez les logs : {e}")
         return None
+
+# Ne modifiez pas le reste du code, il est correct.
 
 model = load_yolo_model()
 
