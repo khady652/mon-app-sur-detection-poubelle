@@ -14,7 +14,7 @@ st.title(" Bienvenu dans votre Application de Détection des Poubelles 🗑️")
 st.markdown("---")
 
 # Nom du fichier modèle
-MODEL_FILE_NAME = "best (1).pt"
+MODEL_FILE_NAME = "best.pt"
 
 @st.cache_resource
 def load_yolo_model():
