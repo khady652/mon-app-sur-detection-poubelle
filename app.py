@@ -25,7 +25,7 @@ def load_yolo_model():
     try:
         # Tenter de charger directement le modèle. YOLO trouvera le fichier s'il est dans le dépôt.
         model = YOLO(MODEL_FILE_NAME) 
-        st.success("✅ Modèle YOLO chargé avec succès.")
+        st.success("")
         return model
     except FileNotFoundError:
         # Affiche un message d'erreur spécifique si le fichier .pt est introuvable
@@ -55,7 +55,7 @@ def predict_and_draw(image):
     
     # --- 2. Exécution de l'Inférence ---
     # Réglage du 'verbose=False' pour éviter les logs de YOLO dans Streamlit
-    results = model(np_image, verbose=False) 
+    results = model(np_image, verbose=False, conf=0.25) 
     
     # --- 3. Extraction du Message de Prédiction ---
     detections = results[0].boxes.cpu().numpy()
@@ -141,7 +141,7 @@ if uploaded_file is not None:
             st.image(processed_image, caption="resultat de la détecton", use_column_width=True)
             
         # Affichage du message de prédiction
-        st.success(f"Analyse terminée ! La détection et le classement sont affichés ci-dessus. {prediction_message}")
+        st.success("✅ FIN  DE L' ANALYSE!!!!!!!!!!!.")
 
     except Exception as e:
         # Affiche toute erreur survenant pendant la lecture ou le traitement de l'image
