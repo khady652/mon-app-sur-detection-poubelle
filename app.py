@@ -33,7 +33,7 @@ def load_yolo_model():
         return None
     except Exception as e:
         # Affiche toute autre erreur lors de l'initialisation (problème de dépendance, etc.)
-        st.error(f"❌ Erreur critique lors du chargement du modèle YOLO : {e}")
+        st.error(f"❌ Erreur  lors du chargement du modèle : {e}")
         return None
 
 # Le modèle est chargé au démarrage de l'application
@@ -46,44 +46,25 @@ model = load_yolo_model()
 def predict_and_draw(image):
     
     if model is None:
-        # Ce cas ne devrait jamais être atteint si le flux principal est corrigé, mais sert de garde-fou.
         return image, "Le traitement est impossible car le modèle n'a pas pu être chargé."
         
-    # --- 1. Préparation de l'image pour YOLO ---
-    # Convertit l'image PIL en un tableau numpy pour l'inférence
     np_image = np.array(image)
+    results = model(np_image, verbose=False, conf=0.5)
     
-    # --- 2. Exécution de l'Inférence ---
-    # Réglage du 'verbose=False' pour éviter les logs de YOLO dans Streamlit
-    results = model(np_image, verbose=False, conf=0.25) 
-    
-    # --- 3. Extraction du Message de Prédiction ---
     detections = results[0].boxes.cpu().numpy()
     
     if len(detections) > 0:
-        # On suppose que l'on prend la première détection
-        best_detection = detections[0]
-        class_id = int(best_detection.cls[0])
-        # Assurez-vous que model.names est correctement mappé
-        predicted_class = model.names.get(class_id, "CLASSE INCONNUE") 
-        confidence = best_detection.conf[0]
-        
-        prediction_message = (
-            f"Le statut détecté est : **{predicted_class.upper()}** "
-            f"avec une confiance de **{confidence:.2f}**."
-        )
+        messages = []
+        for det in detections:
+            class_id = int(det.cls[0])
+            predicted_class = model.names.get(class_id, "CLASSE INCONNUE")
+            confidence = det.conf[0]
+            messages.append(f"{predicted_class.upper()} ")
+        prediction_message = "j'ai detecter une  : " + ", ".join(messages)
     else:
-        prediction_message = "Aucune poubelle n'a été détectée dans cette image."
+        prediction_message = " desole! mais je n' ai detecte aucune poubelle  dans cette image."
         
-    # --- 4. Tracé Automatique par YOLO ---
-    # results[0].plot() retourne un array numpy avec les boîtes tracées
-    plotted_image_array = results[0].plot(
-        labels=True, 
-        conf=True, 
-        line_width=3
-    )
-    
-    # 5. Conversion et Retour
+    plotted_image_array = results[0].plot(labels=True, conf=True, line_width=3)
     processed_image = Image.fromarray(plotted_image_array)
     
     return processed_image, prediction_message
@@ -138,10 +119,8 @@ if uploaded_file is not None:
         
         # 3. Afficher les résultats
         with col2:
-            st.image(processed_image, caption="resultat de la détecton", use_column_width=True)
-            
-        # Affichage du message de prédiction
-        st.success("✅ FIN  DE L' ANALYSE!!!!!!!!!!!.")
+             st.image(processed_image, caption="Résultat de la détection", use_column_width=True)
+             st.info(prediction_message)
 
     except Exception as e:
         # Affiche toute erreur survenant pendant la lecture ou le traitement de l'image
